@@ -2,64 +2,62 @@ package org.example.timereaderrework;
 
 import java.util.Map;
 
-public class Treader {
+public class TimeReader {
 
+    private final int hour;
+    private final int minute;
 
-    private int hour;
-    private int minute;
-    private String partOfDay;
+    public TimeReader(int hour, int minute) {
 
-    public void setHourToRead(int hourToRead) {
-        this.hourToRead = hourToRead;
-    }
-
-    private int hourToRead;
-    private boolean isFullHour;
-
-
-    public Treader(int hour, int minute) {
-        setHour(hour);
-        setMinute(minute);
-        setFullHour(minute);
-        setPartOfDay(hour);
-        this.hourToRead = hour;
-    }
-
-    public void setHour(int hour) {
-        if (hour < 0 || hour > 24) {
-            throw new IllegalArgumentException("Invalid number");
-        }
+        checkHour(hour);
         this.hour = hour;
-    }
-
-    public void setMinute(int minute) {
-        if (minute < 0 || minute > 59) {
-            throw new IllegalArgumentException("Invalid number");
-        }
+        checkMinute(minute);
         this.minute = minute;
     }
 
-    public void setFullHour(int minute) {
+    private void checkMinute(int minute) {
+        if (minute < 0 || minute > 59) {
+            throw new IllegalArgumentException("Invalid number. Set number between 0 to 59");
+        }
+    }
+
+    private void checkHour(int hour) {
+        if (hour < 0 || hour > 24) {
+            throw new IllegalArgumentException("Invalid number. Set number between 1 to 24");
+        }
+    }
+
+    private boolean isFullHour(int minute) {
         if (minute == 0) {
-            isFullHour = true;
+            return true;
         } else {
-            isFullHour = false;
+            return false;
         }
     }
 
-    public void setPartOfDay(int hour) {
-        if (this.hour > 11 && this.hour < 24) {
-            this.partOfDay = " PM";
+    private String getPartOfDay() {
+
+        if (this.hour == 23 && this.minute > 30) {
+            return " AM";
+        } else if (this.hour == 11 && this.minute > 30) {
+            return " PM";
+        } else if (this.hour > 11 && this.hour < 24) {
+            return " PM";
         } else {
-            this.partOfDay = " AM";
+            return " AM";
         }
     }
 
-    public String getPartOfDay() {
-        return partOfDay;
+    private int getHourToRead(){
+        int result = hour;
+
+        if(this.minute > 30)
+            result = this.hour + 1;
+
+        return result;
     }
 
-    public String readMinute() {
+    private String readMinute() {
         String result = "";
         if (minute == 30) {
             result = "half past ";
@@ -67,8 +65,8 @@ public class Treader {
         }
         if (minute > 30) {
             result = translateNumberToString(60 - minute) + " to ";
-            hourToRead = hourToRead + 1;
         }
+
         if (minute < 30) {
             result = translateNumberToString(minute) + " past ";
         }
@@ -76,19 +74,15 @@ public class Treader {
         return result;
     }
 
-
-    public String readHour() {
+    private String readHour() {
         String result = "";
 
-        if (hourToRead == 12) {
+        if (isFullHour(minute) && getHourToRead() == 12) {
             result = "midday";
-        }
-        if (hourToRead == 24) {
+        } else if (isFullHour(minute) && getHourToRead() == 24) {
             result = "midnight";
-        }
-
-        if (hourToRead != 12 && hourToRead != 24) {
-            result = translateNumberToString(to12hFormat(hourToRead)) + getPartOfDay();
+        } else {
+            result = translateNumberToString(to12hFormat(getHourToRead())) + getPartOfDay();
         }
         return result;
     }
@@ -106,7 +100,7 @@ public class Treader {
     public String read() {
         String result = "";
 
-        if (isFullHour) {
+        if (isFullHour(minute)) {
             result = readHour();
         } else {
             result = readMinute() + readHour();
