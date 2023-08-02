@@ -1,18 +1,10 @@
-package org.example.timereaderrework;
+package org.example.timereader;
 
 import java.util.Map;
 
 public class TimeReader {
 
-    private final int hour;
-    private final int minute;
-
-    public TimeReader(int hour, int minute) {
-
-        checkHour(hour);
-        this.hour = hour;
-        checkMinute(minute);
-        this.minute = minute;
+    public TimeReader() {
     }
 
     private void checkMinute(int minute) {
@@ -35,29 +27,29 @@ public class TimeReader {
         }
     }
 
-    private String getPartOfDay() {
+    private String getPartOfDay(int hour, int minute) {
 
-        if (this.hour == 23 && this.minute > 30) {
+        if (hour == 23 && minute > 30) {
             return " AM";
-        } else if (this.hour == 11 && this.minute > 30) {
+        } else if (hour == 11 && minute > 30) {
             return " PM";
-        } else if (this.hour > 11 && this.hour < 24) {
+        } else if (hour > 11 && hour < 24) {
             return " PM";
         } else {
             return " AM";
         }
     }
 
-    private int getHourToRead(){
+    private int getHourToRead(int hour, int minute) {
         int result = hour;
 
-        if(this.minute > 30)
-            result = this.hour + 1;
+        if (minute > 30)
+            result = hour + 1;
 
         return result;
     }
 
-    private String readMinute() {
+    private String readMinute(int minute) {
         String result = "";
         if (minute == 30) {
             result = "half past ";
@@ -74,15 +66,15 @@ public class TimeReader {
         return result;
     }
 
-    private String readHour() {
+    private String readHour(int hour, int minute) {
         String result = "";
 
-        if (isFullHour(minute) && getHourToRead() == 12) {
+        if (isFullHour(minute) && getHourToRead(hour, minute) == 12) {
             result = "midday";
-        } else if (isFullHour(minute) && getHourToRead() == 24) {
+        } else if (isFullHour(minute) && getHourToRead(hour, minute) == 24) {
             result = "midnight";
         } else {
-            result = translateNumberToString(to12hFormat(getHourToRead())) + getPartOfDay();
+            result = translateNumberToString(to12hFormat(getHourToRead(hour, minute))) + getPartOfDay(hour, minute);
         }
         return result;
     }
@@ -97,13 +89,16 @@ public class TimeReader {
         return hour;
     }
 
-    public String read() {
+    public String read(int hour, int minute) {
+        checkMinute(minute);
+        checkHour(hour);
+
         String result = "";
 
         if (isFullHour(minute)) {
-            result = readHour();
+            result = readHour(hour, minute);
         } else {
-            result = readMinute() + readHour();
+            result = readMinute(minute) + readHour(hour, minute);
         }
         return result;
     }

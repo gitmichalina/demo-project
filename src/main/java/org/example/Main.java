@@ -14,6 +14,8 @@ public class Main {
 //        fizzBuzzWhile();
         fizzBuzzIfs3();
 
+        int i = 5;
+        i += Integer.valueOf(1);
     }
 
     public static void fizzBuzzIfs() {
