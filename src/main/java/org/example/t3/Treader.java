@@ -1,9 +1,60 @@
 package org.example.t3;
 
+import java.time.LocalTime;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class Treader {
 
+    private final Supplier<LocalTime> localTimeSupplier;
+    public static final Map<Integer, String> VALUES = Map.ofEntries(
+            Map.entry(0, "twelve"),
+            Map.entry(1, "one"),
+            Map.entry(2, "two"),
+            Map.entry(3, "three"),
+            Map.entry(4, "four"),
+            Map.entry(5, "five"),
+            Map.entry(6, "six"),
+            Map.entry(7, "seven"),
+            Map.entry(8, "eight"),
+            Map.entry(9, "nine"),
+            Map.entry(10, "ten"),
+            Map.entry(11, "eleven"),
+            Map.entry(12, "twelve"),
+            Map.entry(13, "thirteen"),
+            Map.entry(14, "fourteen"),
+            Map.entry(15, "fifteen"),
+            Map.entry(16, "sixteen"),
+            Map.entry(17, "seventeen"),
+            Map.entry(18, "eighteen"),
+            Map.entry(19, "nineteen"),
+            Map.entry(20, "twenty"),
+            Map.entry(30, "thirty"),
+            Map.entry(40, "forty"),
+            Map.entry(50, "fifty")
+    );
+
+    public Treader(Supplier<LocalTime> localTimeSupplier) {
+        this.localTimeSupplier = localTimeSupplier;
+    }
+
+    public String read() {
+        LocalTime time = localTimeSupplier.get();
+        int hour = time.getHour();
+        int minute = time.getMinute();
+
+        checkMinute(minute);
+        checkHour(hour);
+
+        String result = "";
+
+        if (isFullHour(minute)) {
+            result = readHour(hour, minute);
+        } else {
+            result = readMinute(minute) + readHour(hour, minute);
+        }
+        return result;
+    }
 
     private void checkMinute(int minute) {
         if (minute < 0 || minute > 59) {
@@ -78,61 +129,22 @@ public class Treader {
     }
 
     private int to12hFormat(int hour) {
+
         if (hour > 12 && hour < 25) {
-            hour -= 12;
+            return hour - 12;
         }
         if (hour == 25) {
-            hour -= 24;
+            return hour - 24;
         }
         return hour;
     }
 
-    public String read(int hour, int minute) {
-        checkMinute(minute);
-        checkHour(hour);
-
-        String result = "";
-
-        if (isFullHour(minute)) {
-            result = readHour(hour, minute);
-        } else {
-            result = readMinute(minute) + readHour(hour, minute);
-        }
-        return result;
-    }
-
     private String translateNumberToString(int number) {
-        Map<Integer, String> values = Map.ofEntries(
-                Map.entry(0, "twelve"),
-                Map.entry(1, "one"),
-                Map.entry(2, "two"),
-                Map.entry(3, "three"),
-                Map.entry(4, "four"),
-                Map.entry(5, "five"),
-                Map.entry(6, "six"),
-                Map.entry(7, "seven"),
-                Map.entry(8, "eight"),
-                Map.entry(9, "nine"),
-                Map.entry(10, "ten"),
-                Map.entry(11, "eleven"),
-                Map.entry(12, "twelve"),
-                Map.entry(13, "thirteen"),
-                Map.entry(14, "fourteen"),
-                Map.entry(15, "fifteen"),
-                Map.entry(16, "sixteen"),
-                Map.entry(17, "seventeen"),
-                Map.entry(18, "eighteen"),
-                Map.entry(19, "nineteen"),
-                Map.entry(20, "twenty"),
-                Map.entry(21, "twenty one"),
-                Map.entry(22, "twenty two"),
-                Map.entry(23, "twenty three"),
-                Map.entry(24, "twenty four"),
-                Map.entry(25, "twenty five"),
-                Map.entry(30, "thirty"),
-                Map.entry(40, "fourty"),
-                Map.entry(50, "fifty")
-        );
-        return values.get(number);
+        if (number > 20) {
+            int secondDigit = number % 10;
+            int firstDigit = number - secondDigit;
+            return VALUES.get(firstDigit) + " " + VALUES.get(secondDigit);
+        }
+        return VALUES.get(number);
     }
 }
